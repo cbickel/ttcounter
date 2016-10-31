@@ -1,0 +1,38 @@
+body, html {
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+}
+
+div {
+	height: auto;
+}
+
+.point {
+    font-size: 24em;
+    font-weight: bold;
+    text-align: center;
+    min-height: 1em;
+    height: 100%;
+    line-height: normal;
+    vertical-align: middle;
+}
+
+.player {
+	font-size: 10em;
+	text-align: center;
+	display:inline-block;
+	min-height: 2em;
+	line-height: normal;
+	vertical-align: middle;
+}
+
+.satz {
+    font-size: 10em;
+    font-weight: bold;
+    text-align: center;
+    min-height: 1em;
+    height: 100%;
+    line-height: normal;
+    vertical-align: middle;
+}
