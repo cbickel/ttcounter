@@ -17,7 +17,7 @@ $(document).ready(function(){
     var config = {
       "org" : "gm7xvu",
       "type" : "Browser",
-      "id" : "browser",
+      "id" : "browser" + parseInt(Math.random() * 8192),
       "auth-key" : "a-gm7xvu-unqt2bj20h",
       "auth-token" : "8oMm9wLB0vyWNjtuH!"
     };
