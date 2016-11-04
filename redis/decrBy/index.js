@@ -3,6 +3,8 @@ var redis = require("redis");
 function myAction(params) {
 
     var key = params.key || "";
+    var value = params.value || 0;
+    console.log("Decr " + key + " by " + value);
 
     var client = redis.createClient(params.port, params.host);
     client.auth(params.password);
@@ -12,10 +14,10 @@ function myAction(params) {
 //    });
 
     return new Promise(function(resolve, reject) {
-        client.get(key, function(err, reply) {
+        client.send_command("DECRBY", [key, value], function(err, reply) {
             client.quit();
-            console.log("Increased to: " + reply);
-            resolve({ payload: { [key]: reply } });
+            console.log("DecrBy is: " + reply);
+            resolve({ payload: reply });
         });
     });
 }

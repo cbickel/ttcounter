@@ -1,5 +1,5 @@
 #!/bin/sh
-actions=( "get" "incr" "del" )
+actions=( "get" "incr" "del" "mget" "decrBy" "mset" "expire" "rpush" "rpop" )
 
 wsk package update redis
 for action in "${actions[@]}"

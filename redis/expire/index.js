@@ -3,6 +3,8 @@ var redis = require("redis");
 function myAction(params) {
 
     var key = params.key || "";
+    var seconds = params.seconds || 300;
+    console.log("EXPIRE:  " + key + " in: " + seconds);
 
     var client = redis.createClient(params.port, params.host);
     client.auth(params.password);
@@ -12,10 +14,10 @@ function myAction(params) {
 //    });
 
     return new Promise(function(resolve, reject) {
-        client.get(key, function(err, reply) {
+        client.send_command("EXPIRE", [key, seconds], function(err, reply) {
             client.quit();
-            console.log("Increased to: " + reply);
-            resolve({ payload: { [key]: reply } });
+            console.log("EXPIRE is: " + reply);
+            resolve({ payload: reply });
         });
     });
 }

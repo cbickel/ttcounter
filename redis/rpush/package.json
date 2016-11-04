@@ -1,0 +1,8 @@
+{
+  "name": "rpush",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {
+      "redis": "*"
+  }
+}
