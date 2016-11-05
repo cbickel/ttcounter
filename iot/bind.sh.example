@@ -1,0 +1,8 @@
+#!/bin/sh
+org=""
+id=""
+type=""
+authMethod=""
+authToken=""
+
+wsk package bind iot myIot -p org $org -p id $id -p type $type -p authMethod $authMethod -p authToken $authToken

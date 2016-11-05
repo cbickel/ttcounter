@@ -1,32 +1,39 @@
 var redis = require("redis");
 
 function myAction(params) {
+    var payload = params.payload || {};
+    console.log("Input: " + JSON.stringify(payload));
 
-    var key = params.key || "";
+    var keys = [];
+    for (var key in payload) {
+        keys.push(key);
+    }
 
     var client = redis.createClient(params.port, params.host);
-    client.auth(params.password);
-    client.on("error", function(err) {
-        console.log("Error: " + err);
-        whisk.error("Error: " + err);
-    });
-    client.set("message", "Hello, world!");
-
-//    client.get("message", function(err, reply) {
-//        client.quit();
-//        console.log("Fetched Message: " + reply);
-//        whisk.done({result: reply});
-//    });
+    if (params.password) {
+        client.auth(params.password);
+    }
 
     return new Promise(function(resolve, reject) {
-        client.incr(key, function(err, reply) {
+        client.on("error", function(err) {
+            console.log("Error: " + err);
+            reject({
+                error: err
+            });
+        });
+
+        client.incr(keys[0], function(err, reply) {
             client.quit();
-            console.log("Increased: " + reply);
-            resolve({ message: reply });
+            console.log("INCR got: " + reply);
+
+            payload[keys[0]] = reply;
+            console.log("Return: " + JSON.stringify(payload));
+
+            resolve({
+                payload: payload
+            });
         });
     });
-
-//    return whisk.async();
 }
 
 exports.main = myAction;

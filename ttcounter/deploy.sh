@@ -1,19 +1,27 @@
 #!/bin/sh
-actions=( "afterSetHandling" )
 
-wsk package update ttcounter
-for action in "${actions[@]}"
-do
-    cd $action
-    npm install
-    zip -r action.zip *
-    wsk action update ttcounter/$action --kind nodejs:6 action.zip
-    cd ..
-done
+#afterSetHandling
+wsk trigger update afterSet -P allKeys.json
+wsk action update afterSetHandling afterSetHandling.js
+wsk action update afterSetSequence --sequence myRedis/mget,afterSetHandling,myRedis/mset
+wsk rule update afterSetRule afterSet afterSetSequence
 
-wsk action update ttcounter/allKeys allKeys.js
-wsk action update ttcounter/refreshScore --sequence ttcounter/allKeys,myRedis/mget,myIot/publish
-wsk action update ttcounter/point --sequence myRedis/incr,ttcounter/refreshScore,ttcounter/afterSetHandling,myRedis/rpush,myRedis/expire
-wsk action update ttcounter/resetKeysAndValues resetKeysAndValues.js
-wsk action update ttcounter/reset --sequence ttcounter/resetKeysAndValues,myRedis/mset,ttcounter/refreshScore
-# wsk action update ttcounter/back --sequence myRedis/rpop,
+#point
+wsk trigger update point
+cd triggerAfterSet
+npm install
+zip -r action.zip *
+wsk action update triggerAfterSet --kind nodejs:6 action.zip
+cd ..
+wsk action update pointSequence --sequence myRedis/incr,myIot/publish,triggerAfterSet
+wsk rule update pointRule point pointSequence
+
+#refreshScore
+wsk trigger update refreshScore -P allKeys.json
+wsk action update refreshSequence --sequence myRedis/mget,myIot/publish
+wsk rule update refreshScoreRule refreshScore refreshSequence
+
+#reset
+wsk trigger update reset -P reset.json
+wsk action update resetSequence --sequence myRedis/mset,myIot/publish
+wsk rule update resetRule reset resetSequence

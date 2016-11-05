@@ -1,26 +1,37 @@
 var redis = require("redis");
 
 function myAction(params) {
+    var payload = params.payload;
+    console.log("Input: " + JSON.stringify(payload));
 
-    var keys = params.keys || [];
-    console.log(keys);
+    var keys = [];
+    for (var key in payload) {
+        keys.push(key);
+    }
 
     var client = redis.createClient(params.port, params.host);
-    client.auth(params.password);
-//    client.on("error", function(err) {
-//        console.log("Error: " + err);
-//        whisk.error("Error: " + err);
-//    });
+    if (params.password) {
+        client.auth(params.password);
+    }
 
     return new Promise(function(resolve, reject) {
+        client.on("error", function(err) {
+            console.log("Error: " + err);
+            reject({
+                error: err
+            });
+        });
         client.mget(keys, function(err, reply) {
             client.quit();
-            console.log("MGET is: " + reply);
-            var result = {};
+            console.log("MGET got: " + reply);
+
             keys.forEach(function(current, index) {
-              result[current] = reply[index];
+                payload[current] = reply[index];
             });
-            resolve({ payload: result });
+            console.log("Return: " + JSON.stringify(payload));
+            resolve({
+                payload: payload
+            });
         });
     });
 }

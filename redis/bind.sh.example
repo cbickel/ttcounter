@@ -1,0 +1,6 @@
+#!/bin/sh
+host=""
+port=
+password=""
+
+wsk package bind redis myRedis -p host $host -p port $port -p password $password

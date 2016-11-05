@@ -24,9 +24,9 @@ var request = require('request');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.post('/point', function(req, res, next){
-    console.log('/point' + req.body);
-    wskInvoke('point', req.body);
-    res.end(req.body.key);
+    console.log('/point ' + req.body);
+    wskInvoke('point', {payload: req.body});
+    res.end("200");
 });
 app.post('/refreshScore', function(req, res, next){
     console.log('/refreshScore');
@@ -41,7 +41,7 @@ app.post('/reset', function(req, res, next){
 function wskInvoke(name, body) {
     request({
         method: 'POST',
-        uri: 'https://openwhisk.ng.bluemix.net/api/v1/namespaces/cbickel@de.ibm.com_dev/actions/ttcounter/' + name + '?blocking=false',
+        uri: 'https://openwhisk.ng.bluemix.net/api/v1/namespaces/cbickel@de.ibm.com_dev/triggers/' + name,
         auth: {
             user: "",
             pass: ""

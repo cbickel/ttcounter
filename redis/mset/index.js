@@ -1,22 +1,35 @@
 var redis = require("redis");
 
 function myAction(params) {
+    var payload = params.payload || {};
+    console.log("Input: " + JSON.stringify(payload));
 
-    var keyValues = params.keyValues || [];
-    console.log("MSET " + keyValues);
+    var keysAndValues = [];
+    for (var key in payload) {
+        keysAndValues.push(key);
+        keysAndValues.push(payload[key]);
+    }
 
     var client = redis.createClient(params.port, params.host);
-    client.auth(params.password);
-//    client.on("error", function(err) {
-//        console.log("Error: " + err);
-//        whisk.error("Error: " + err);
-//    });
+    if (params.password) {
+        client.auth(params.password);
+    }
 
     return new Promise(function(resolve, reject) {
-        client.send_command("MSET", keyValues, function(err, reply) {
+        client.on("error", function(err) {
+            console.log("Error: " + err);
+            reject({
+                error: err
+            });
+        });
+        client.send_command("MSET", keysAndValues, function(err, reply) {
             client.quit();
-            console.log("MSET is: " + reply);
-            resolve({ payload: reply });
+            console.log("MSET got: " + reply);
+
+            console.log("Return: " + JSON.stringify(payload));
+            resolve({
+                payload: payload
+            });
         });
     });
 }

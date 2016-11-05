@@ -1,5 +1,5 @@
 {
-  "name": "afterSetHandling",
+  "name": "triggerAfterSet",
   "version": "1.0.0",
   "main": "index.js",
   "devDependencies": {
