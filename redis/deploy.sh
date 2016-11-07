@@ -1,5 +1,5 @@
 #!/bin/sh
-actions=( "mget" "incr" "mset" )
+actions=( "mget" "incr" "mset" "rpush" "rpop" )
 package="redis"
 
 wsk package update $package

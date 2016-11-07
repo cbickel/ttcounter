@@ -38,6 +38,11 @@ app.post('/reset', function(req, res, next){
     wskInvoke('reset', {});
     res.end(req.body.key);
 });
+app.post('/back', function(req, res, next){
+    console.log('/back' + req.body);
+    wskInvoke('back', {});
+    res.end(req.body.key);
+});
 function wskInvoke(name, body) {
     request({
         method: 'POST',

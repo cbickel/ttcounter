@@ -1,22 +1,39 @@
 var redis = require("redis");
 
 function myAction(params) {
+    var payload = params.payload || {};
+    console.log("Input: " + JSON.stringify(payload));
 
-    var key = params.key || "";
-    console.log("RPOP " + key);
+    var keys = [];
+    for (var key in payload) {
+        keys.push(key);
+    }
+    console.log(keys);
+    console.log(keys[0]);
 
     var client = redis.createClient(params.port, params.host);
-    client.auth(params.password);
-//    client.on("error", function(err) {
-//        console.log("Error: " + err);
-//        whisk.error("Error: " + err);
-//    });
+    if (params.password) {
+        client.auth(params.password);
+    }
 
     return new Promise(function(resolve, reject) {
-        client.send_command("RPOP", [key], function(err, reply) {
+        client.on("error", function(err) {
+            console.log("Error: " + err);
+            reject({
+                error: err
+            });
+        });
+
+        client.send_command("RPOP", [keys[0]], function(err, reply) {
             client.quit();
-            console.log("RPOP is: " + reply);
-            resolve({ key: key });
+            console.log("RPOP got: " + reply);
+
+            payload[keys[0]] = reply;
+            console.log("Return: " + JSON.stringify(payload));
+
+            resolve({
+                payload: payload
+            });
         });
     });
 }

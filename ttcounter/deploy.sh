@@ -1,19 +1,18 @@
 #!/bin/sh
 
-#afterSetHandling
-wsk trigger update afterSet -P allKeys.json
-wsk action update afterSetHandling afterSetHandling.js
-wsk action update afterSetSequence --sequence myRedis/mget,afterSetHandling,myRedis/mset
-wsk rule update afterSetRule afterSet afterSetSequence
+#backup / back
+wsk action update backupToScore backupToScore.js
+wsk action update scoreToBackup scoreToBackup.js
+wsk action update backup --sequence scoreToBackup,myRedis/rpush
+wsk trigger update back -p payload "{\"backup\":null}"
+wsk action update backSequence --sequence myRedis/rpop,myRedis/rpop,backupToScore,myRedis/mset,myIot/publish,backup
+wsk rule update backRule back backSequence
 
 #point
+wsk action update afterSetHandling afterSetHandling.js
+wsk action update allKeys allKeys.js
 wsk trigger update point
-cd triggerAfterSet
-npm install
-zip -r action.zip *
-wsk action update triggerAfterSet --kind nodejs:6 action.zip
-cd ..
-wsk action update pointSequence --sequence myRedis/incr,myIot/publish,triggerAfterSet
+wsk action update pointSequence --sequence myRedis/incr,myIot/publish,allKeys,myRedis/mget,afterSetHandling,myRedis/mset,backup
 wsk rule update pointRule point pointSequence
 
 #refreshScore
@@ -23,5 +22,5 @@ wsk rule update refreshScoreRule refreshScore refreshSequence
 
 #reset
 wsk trigger update reset -P reset.json
-wsk action update resetSequence --sequence myRedis/mset,myIot/publish
+wsk action update resetSequence --sequence myRedis/mset,myIot/publish,backup
 wsk rule update resetRule reset resetSequence

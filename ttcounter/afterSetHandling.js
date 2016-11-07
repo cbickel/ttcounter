@@ -6,11 +6,8 @@ function main(params) {
         payload.p1 = 0;
         payload.p2 = 0;
         payload[setWinner] = parseInt(payload[setWinner]) + 1;
-
-        return { payload: payload };
-    } else {
-        return { error: "Set is not finished yet." };
     }
+    return { payload: payload };
 }
 
 function isSetFinished(payload) {
